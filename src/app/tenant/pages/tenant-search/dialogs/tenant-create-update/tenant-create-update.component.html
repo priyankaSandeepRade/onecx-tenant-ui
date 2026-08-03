@@ -1,16 +1,14 @@
-<p-tabMenu *ngIf="dialogMode !== dialogModeEnum.CREATE" [model]="menuItems" [activeItem]="menuItems[0]">
-  <ng-template pTemplate="item" let-item>
-    <a class="p-menuitem-link" [pTooltip]="item.tooltip | translate" tooltipPosition="top">
-      <span class="ml-2">
-        {{ item.label | translate }}
-      </span>
+<p-tabMenu *ngIf="dialogMode !== dialogModeEnum.CREATE" [model]="menuItems" [(activeItem)]="activeMenuItem">
+  <ng-template #item let-item>
+    <a #tabLink class="p-menuitem-link" [pTooltip]="item.tooltip | translate" tooltipPosition="top">
+      <span class="p-menuitem-text">{{ (item.label | translate) || item.label }}</span>
     </a>
   </ng-template>
 </p-tabMenu>
 
 <form [formGroup]="formGroup" class="mt-5 sm:mx-2 flex flex-wrap flex-column row-gap-3 sm:row-gap-4">
   @if (selectedTab === 'main') {
-    <span class="p-float-label" controlErrorAnchor>
+    <p-floatlabel controlErrorAnchor variant="on">
       <input
         pInputText
         type="text"
@@ -24,8 +22,8 @@
       <label class="ocx-required-label" for="tm_detail_form_orgId">
         {{ 'TENANT_CREATE_UPDATE.FORM.ORG_ID' | translate }}
       </label>
-    </span>
-    <span class="p-float-label" controlErrorAnchor>
+    </p-floatlabel>
+    <p-floatlabel controlErrorAnchor variant="on">
       <input
         pInputText
         type="text"
@@ -38,7 +36,7 @@
       <label class="ocx-required-label" for="tm_detail_form_tenantId">
         {{ 'TENANT_CREATE_UPDATE.FORM.TENANT_ID' | translate }}
       </label>
-    </span>
+    </p-floatlabel>
 
     <div class="flex flex-row align-items-center gap-4" *ngIf="dialogMode !== dialogModeEnum.CREATE">
       <input #fileInput type="file" accept="image/png, image/jpeg" class="hidden" (change)="handleFileChange($event)" />
@@ -93,7 +91,7 @@
       }
     </div>
 
-    <span class="p-float-label" controlErrorAnchor>
+    <p-floatlabel controlErrorAnchor variant="on">
       <textarea
         pInputTextarea
         rows="3"
@@ -105,9 +103,9 @@
         tooltipPosition="top"
       ></textarea>
       <label for="tm_detail_form_description"> {{ 'TENANT_CREATE_UPDATE.FORM.DESCRIPTION' | translate }}</label>
-    </span>
+    </p-floatlabel>
   } @else {
-    <span class="p-float-label" controlErrorAnchor>
+    <p-floatlabel controlErrorAnchor variant="on">
       <input
         pInputText
         type="text"
@@ -118,8 +116,8 @@
         tooltipPosition="top"
       />
       <label for="tm_detail_form_creationUser"> {{ 'TENANT_CREATE_UPDATE.FORM.CREATION_USER' | translate }}</label>
-    </span>
-    <span class="p-float-label" controlErrorAnchor>
+    </p-floatlabel>
+    <p-floatlabel controlErrorAnchor variant="on">
       <input
         pInputText
         type="text"
@@ -130,8 +128,8 @@
         tooltipPosition="top"
       />
       <label for="tm_detail_form_creationDate"> {{ 'TENANT_CREATE_UPDATE.FORM.CREATION_DATE' | translate }}</label>
-    </span>
-    <span class="p-float-label" controlErrorAnchor>
+    </p-floatlabel>
+    <p-floatlabel controlErrorAnchor variant="on">
       <input
         pInputText
         type="text"
@@ -144,9 +142,9 @@
       <label for="tm_detail_form_modificationUser">
         {{ 'TENANT_CREATE_UPDATE.FORM.MODIFICATION_USER' | translate }}
       </label>
-    </span>
+    </p-floatlabel>
 
-    <span class="p-float-label" controlErrorAnchor>
+    <p-floatlabel controlErrorAnchor variant="on">
       <input
         pInputText
         type="text"
@@ -159,6 +157,6 @@
       <label for="tm_detail_form_modificationDate">
         {{ 'TENANT_CREATE_UPDATE.FORM.MODIFICATION_DATE' | translate }}
       </label>
-    </span>
+    </p-floatlabel>
   }
 </form>

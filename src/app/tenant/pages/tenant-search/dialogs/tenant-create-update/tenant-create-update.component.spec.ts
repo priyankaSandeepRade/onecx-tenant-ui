@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { Location } from '@angular/common'
-import { BreadcrumbService, PortalCoreModule } from '@onecx/portal-integration-angular'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 import { AppStateServiceMock, provideAppStateServiceMock } from '@onecx/angular-integration-interface/mocks'
 import { TranslateTestingModule } from 'ngx-translate-testing'
 import { TenantCreateUpdateComponent } from './tenant-create-update.component'
@@ -62,9 +62,9 @@ describe('TenantCreateUpdateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [TenantCreateUpdateComponent],
       imports: [
-        PortalCoreModule,
+        TenantCreateUpdateComponent,
+        AngularAcceleratorModule,
         FormsModule,
         ReactiveFormsModule,
         TranslateTestingModule.withTranslations({
@@ -73,7 +73,6 @@ describe('TenantCreateUpdateComponent', () => {
         }).withDefaultLanguage('en')
       ],
       providers: [
-        BreadcrumbService,
         FormBuilder,
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         { provide: ImagesAPIService, useValue: mockedImageService },

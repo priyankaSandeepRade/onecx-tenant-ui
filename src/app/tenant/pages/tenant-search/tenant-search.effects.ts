@@ -1,5 +1,5 @@
-import { PortalDialogConfig, PortalDialogService } from '@onecx/portal-integration-angular'
-import { concat, mergeMap, Observable, withLatestFrom, catchError, last, map, of, switchMap, tap } from 'rxjs'
+import { PortalDialogConfig, PortalDialogService } from '@onecx/angular-accelerator'
+import { concat, from, mergeMap, Observable, catchError, last, map, of, switchMap, tap } from 'rxjs'
 import { Injectable, SkipSelf } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
@@ -93,8 +93,12 @@ export class TenantSearchEffects {
   openDialogForExistingEntry$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(TenantSearchActions.dialogForExistingEntryOpened),
-      withLatestFrom(of(this.userServcie.hasPermission('TENANT#ADMIN_EDIT'))),
-      map(([action, hasEditPermission]) => {
+      mergeMap((action) =>
+        from(this.userServcie.hasPermission('TENANT#ADMIN_EDIT')).pipe(
+          map((hasEditPermission) => ({ action, hasEditPermission }))
+        )
+      ),
+      map(({ action, hasEditPermission }) => {
         if (hasEditPermission) {
           return TenantSearchActions.editTenantButtonClicked({ id: action.id })
         }

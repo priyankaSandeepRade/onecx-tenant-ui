@@ -1,12 +1,33 @@
+import { CommonModule } from '@angular/common'
 import { Component, Inject, LOCALE_ID, OnInit, QueryList, ViewChildren } from '@angular/core'
-import { FormBuilder, FormControlName, FormGroup } from '@angular/forms'
+import { FormBuilder, FormControlName, FormGroup, ReactiveFormsModule } from '@angular/forms'
+import { LetDirective } from '@ngrx/component'
 import { Store } from '@ngrx/store'
+import { TranslateModule } from '@ngx-translate/core'
 import { BehaviorSubject, debounceTime, distinctUntilChanged, first, map, Observable, withLatestFrom } from 'rxjs'
 import { PrimeIcons } from 'primeng/api'
+import { ButtonModule } from 'primeng/button'
+import { CardModule } from 'primeng/card'
+import { FloatLabelModule } from 'primeng/floatlabel'
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
+import { InputGroupModule } from 'primeng/inputgroup'
+import { InputTextModule } from 'primeng/inputtext'
+import { TooltipModule } from 'primeng/tooltip'
 import deepEqual from 'fast-deep-equal'
 
-import { Action, BreadcrumbService, DataAction, DataSortDirection, RowListGridData } from '@onecx/angular-accelerator'
-import { DataTableColumn, ExportDataService, SearchConfigData, UserService } from '@onecx/portal-integration-angular'
+import {
+  Action,
+  AngularAcceleratorModule,
+  BreadcrumbService,
+  DataAction,
+  DataSortDirection,
+  DataTableColumn,
+  ExportDataService,
+  RowListGridData,
+  SearchConfigData
+} from '@onecx/angular-accelerator'
+import { PortalPageComponent } from '@onecx/angular-utils'
+import { UserService } from '@onecx/angular-integration-interface'
 
 import { isValidDate } from 'src/app/shared/utils/isValidDate.utils'
 
@@ -14,11 +35,29 @@ import { TenantSearchActions } from './tenant-search.actions'
 import { TenantSearchCriteria, tenantSearchCriteriasSchema } from './tenant-search.parameters'
 import { selectTenantSearchViewModel } from './tenant-search.selectors'
 import { TenantSearchViewModel } from './tenant-search.viewmodel'
+import { ImageContainerComponent } from 'src/app/shared/components/image-container/image-container.component'
 import { ImagesAPIService, Tenant } from 'src/app/shared/generated'
 import { getImageUrl } from 'src/app/shared/utils/image.utils'
 
 @Component({
   selector: 'app-tenant-search',
+  standalone: true,
+  imports: [
+    AngularAcceleratorModule,
+    ButtonModule,
+    CardModule,
+    CommonModule,
+    FloatLabelModule,
+    ImageContainerComponent,
+    InputGroupAddonModule,
+    InputGroupModule,
+    InputTextModule,
+    LetDirective,
+    PortalPageComponent,
+    ReactiveFormsModule,
+    TooltipModule,
+    TranslateModule
+  ],
   templateUrl: './tenant-search.component.html',
   styleUrls: ['./tenant-search.component.scss']
 })
@@ -65,13 +104,7 @@ export class TenantSearchComponent implements OnInit {
 
   filteredResults$ = new BehaviorSubject<RowListGridData[]>([])
   imageBasePath = this.imageService.configuration.basePath!
-  additionalActions: DataAction[] = [
-    {
-      icon: this.userService.hasPermission('TENANT#ADMIN_EDIT') ? PrimeIcons.PENCIL : PrimeIcons.EYE,
-      callback: (data) => this.handleOpenEntryDetails(data as RowListGridData),
-      permission: 'TENANT#SEARCH'
-    }
-  ]
+  additionalActions: DataAction[] = []
 
   public tenantSearchForm: FormGroup = this.formBuilder.group({
     ...(Object.fromEntries(tenantSearchCriteriasSchema.keyof().options.map((k) => [k, null])) as Record<
@@ -79,7 +112,7 @@ export class TenantSearchComponent implements OnInit {
       unknown
     >)
   } satisfies Record<keyof TenantSearchCriteria, unknown>)
-  public tenantFilterFormControl = this.formBuilder.control(null)
+  public tenantFilterFormControl = this.formBuilder.control<string | null>(null)
 
   @ViewChildren(FormControlName) visibleFormControls!: QueryList<FormControlName>
 
@@ -94,6 +127,12 @@ export class TenantSearchComponent implements OnInit {
   ) {}
 
   public ngOnInit() {
+    this.updateAdditionalActions(false)
+    this.userService
+      .hasPermission('TENANT#ADMIN_EDIT')
+      .then((hasPermission) => this.updateAdditionalActions(hasPermission))
+      .catch(() => this.updateAdditionalActions(false))
+
     this.breadcrumbService.setItems([
       {
         titleKey: 'TENANT_SEARCH.BREADCRUMB',
@@ -164,6 +203,19 @@ export class TenantSearchComponent implements OnInit {
     this.store.dispatch(TenantSearchActions.displayedColumnsChanged({ displayedColumns }))
   }
 
+  onDisplayedColumnKeysChange(displayedColumnKeys: string[]) {
+    this.viewModel$.pipe(first()).subscribe((vm) => {
+      const displayedColumns = displayedColumnKeys
+        .map((columnKey) => vm.columns.find((column) => column.id === columnKey))
+        .filter((column): column is DataTableColumn => column !== undefined)
+      this.onDisplayedColumnsChange(displayedColumns)
+    })
+  }
+
+  getDisplayedColumnKeys(displayedColumns: DataTableColumn[]): string[] {
+    return displayedColumns.map((column) => column.id)
+  }
+
   toggleChartVisibility() {
     this.store.dispatch(TenantSearchActions.chartVisibilityToggled())
   }
@@ -176,14 +228,49 @@ export class TenantSearchComponent implements OnInit {
     this.store.dispatch(TenantSearchActions.createTenantButtonClicked())
   }
 
+  onGlobalFilter(value: string) {
+    this.tenantFilterFormControl.setValue(value)
+  }
+
+  onClearGlobalFilter(filterInput: HTMLInputElement) {
+    filterInput.value = ''
+    this.clearTextFilters()
+  }
+
   clearTextFilters(emitEvent = true) {
     this.tenantFilterFormControl.setValue(null, { emitEvent })
+  }
+
+  private normalizeSearchCriteriaValue(value: unknown): unknown {
+    if (isValidDate(value)) {
+      return new Date(
+        Date.UTC(
+          value.getFullYear(),
+          value.getMonth(),
+          value.getDate(),
+          value.getHours(),
+          value.getMinutes(),
+          value.getSeconds()
+        )
+      )
+    }
+    return value || null
   }
 
   private isVisible(control: string) {
     return this.visibleFormControls.some(
       (formControl) => formControl.name !== null && String(formControl.name) === control
     )
+  }
+
+  private updateAdditionalActions(hasEditPermission: boolean) {
+    this.additionalActions = [
+      {
+        icon: hasEditPermission ? PrimeIcons.PENCIL : PrimeIcons.EYE,
+        callback: (data) => this.handleOpenEntryDetails(data as RowListGridData),
+        permission: 'TENANT#SEARCH'
+      }
+    ]
   }
 
   private makeSubscriptions() {

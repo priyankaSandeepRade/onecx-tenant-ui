@@ -1,7 +1,6 @@
 import { createSelector } from '@ngrx/store'
 
-import { RowListGridData } from '@onecx/angular-accelerator'
-import { DataTableColumn } from '@onecx/portal-integration-angular'
+import { DataTableColumn, RowListGridData } from '@onecx/angular-accelerator'
 import { createChildSelectors } from '@onecx/ngrx-accelerator'
 
 import { tenantFeature } from '../../tenant.reducers'

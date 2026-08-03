@@ -1,6 +1,6 @@
 <ocx-portal-page permission="TENANT#SEARCH" helpArticleId="PAGE_TENANT_SEARCH" *ngrxLet="viewModel$; let vm">
   <ocx-search-header
-    [headline]="'TENANT_SEARCH.HEADER' | translate"
+    [header]="'TENANT_SEARCH.HEADER' | translate"
     [subheader]="'TENANT_SEARCH.SUB_HEADER' | translate"
     (searched)="onSearch(tenantSearchForm)"
     (resetted)="onResetSearchCriteria()"
@@ -13,7 +13,7 @@
     (selectedSearchConfigChanged)="searchConfigInfoSelectionChanged($event)"
   >
     <div [formGroup]="tenantSearchForm" class="flex flex-row flex-wrap gap-3">
-      <span class="p-float-label">
+      <p-floatlabel>
         <input
           pInputText
           id="tm_search_orgId"
@@ -26,7 +26,7 @@
           tooltipEvent="hover"
         />
         <label for="tm_search_orgId" class="text-responsive"> {{ 'TENANT_SEARCH.CRITERIA.ORGID' | translate }} </label>
-      </span>
+      </p-floatlabel>
     </div>
   </ocx-search-header>
 
@@ -43,38 +43,46 @@
         [emptyResultsMessage]="'TENANT_SEARCH.EMPTY_RESULTS' | translate"
         [supportedViewLayouts]="['list', 'grid', 'table']"
         [layout]="layout"
-        (displayedColumnsChange)="onDisplayedColumnsChange($event)"
+        [displayedColumnKeys]="getDisplayedColumnKeys(vm.displayedColumns)"
+        (displayedColumnKeysChange)="onDisplayedColumnKeysChange($event)"
         [defaultGroupKey]="'TENANT_SEARCH.PREDEFINED_GROUP.DEFAULT'"
         [pageSizes]="[10, 50, 200]"
         [sortField]="'tenantId'"
         [sortDirection]="ascendingSortDirection"
       >
         <ng-template #topCenter>
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
+          <p-inputgroup class="w-auto tm-filter-group">
+            <p-inputgroup-addon>
               <i class="pi pi-filter"></i>
-            </span>
-            <span class="p-float-label" controlErrorAnchor>
+            </p-inputgroup-addon>
+            <p-floatlabel class="tm-filter-float" variant="on">
               <input
+                #filterInput
                 id="tm_search_filter"
+                type="text"
+                class="tm-filter-input"
                 pInputText
-                [formControl]="tenantFilterFormControl"
+                [value]="tenantFilterFormControl.value ?? ''"
                 [tooltipPosition]="'bottom'"
                 [pTooltip]="'TENANT_SEARCH.FILTER.TOOLTIP' | translate"
+                tooltipEvent="hover"
+                (input)="onGlobalFilter(filterInput.value)"
               />
-              <label for="tm_search_filter"> {{ 'TENANT_SEARCH.FILTER.LABEL' | translate }}</label>
-            </span>
-            <button
-              pButton
-              type="button"
+              <label for="tm_search_filter" aria-hidden="true"> {{ 'TENANT_SEARCH.FILTER.LABEL' | translate }}</label>
+            </p-floatlabel>
+            <p-button
+              id="tm_search_filter_clear"
               icon="pi pi-filter-slash"
-              class="p-button-primary"
-              (click)="clearTextFilters()"
+              styleClass="tm-filter-clear"
               [disabled]="!tenantFilterFormControl.value"
+              [ariaLabel]="'TENANT_SEARCH.FILTER.CLEAR' | translate"
               [pTooltip]="'TENANT_SEARCH.FILTER.CLEAR' | translate"
               tooltipPosition="top"
-            ></button>
-          </div>
+              tooltipEvent="hover"
+              (click)="onClearGlobalFilter(filterInput)"
+              (keydown.enter)="onClearGlobalFilter(filterInput)"
+            />
+          </p-inputgroup>
         </ng-template>
 
         <!-- LIST -->
@@ -82,7 +90,7 @@
           <ng-template #listItem let-item let-i="index">
             <article
               [id]="'tm_search_data_list_row_' + i"
-              class="w-full sm:mx-3 py-1 px-3 flex flex-row flex-nowrap justify-content-start align-items-center column-gap-3 hover:bg-gray-200 cursor-pointer list-item-row"
+              class="w-full sm:mx-3 py-1 px-3 flex flex-row flex-nowrap justify-content-start align-items-center column-gap-3 border-1 border-transparent border-round-sm transition-colors transition-duration-150 hover:surface-100 hover:border-100 cursor-pointer list-item-row"
               [attr.aria-label]="item['orgId']"
               (click)="handleOpenEntryDetails(item)"
               (onkeypress)="handleOpenEntryDetails(item)"
@@ -137,9 +145,9 @@
 
         <!-- GRID -->
         <ng-template #gridItem let-item let-i="index">
-          <div class="col-6 md:col-4 xl:col-3 p-2 md:p-3">
-            <article
-              class="card p-2 flex flex-column gap-1 sm:gap-2 justify-content-between text-center hover:bg-gray-200 cursor-pointer"
+          <div class="col-6 md:col-4 xl:col-3 tenant-grid-tile">
+            <p-card
+              styleClass="p-2 flex flex-column gap-1 sm:gap-2 justify-content-between text-center border-1 border-transparent transition-colors transition-duration-150 hover:surface-100 hover:border-100 cursor-pointer"
               (click)="handleOpenEntryDetails(item)"
               (onkeypress)="handleOpenEntryDetails(item)"
               (keydown.enter)="handleOpenEntryDetails(item)"
@@ -175,7 +183,7 @@
                   [bffUrl]="getImageUrl(item['id'])"
                 ></app-image-container>
               </div>
-            </article>
+            </p-card>
           </div>
         </ng-template>
       </ocx-interactive-data-view>

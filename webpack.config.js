@@ -1,5 +1,43 @@
 const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src/utils/modify-entry-plugin')
 const { share, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack')
+const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
+
+const modifyPrimeNgPlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        return module.resource && module.resource.includes('primeng')
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          'document\\.createElement\\(([^)]+)\\)',
+          'document.createElementFromPrimeNg({"this": this, "arguments": Array.from(arguments), element: $1})'
+        ),
+        new ReplaceOperation('all', 'Theme.setLoadedStyleName', '(function(_){})')
+      ]
+    }
+  ]
+})
+
+const modifyMaterialPlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        return (
+          module.resource && (module.resource.includes('@angular/material') || module.resource.includes('@angular/cdk'))
+        )
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          'document\\.createElement\\(',
+          'document.createElementFromMaterial({"this": this, "arguments": Array.from(arguments)},'
+        )
+      ]
+    }
+  ]
+})
 
 const config = withModuleFederationPlugin({
   name: 'onecx-tenant-ui',
@@ -14,6 +52,11 @@ const config = withModuleFederationPlugin({
     '@angular/forms': { requiredVersion: 'auto', includeSecondaries: true },
     '@angular/platform-browser': { requiredVersion: 'auto', includeSecondaries: true },
     '@angular/router': { requiredVersion: 'auto', includeSecondaries: true },
+    '@ngrx/component': { requiredVersion: 'auto', includeSecondaries: true },
+    '@ngrx/effects': { requiredVersion: 'auto', includeSecondaries: true },
+    '@ngrx/router-store': { requiredVersion: 'auto', includeSecondaries: true },
+    '@ngrx/store': { requiredVersion: 'auto', includeSecondaries: true },
+    '@ngrx/store-devtools': { requiredVersion: 'auto', includeSecondaries: true },
     '@ngx-translate/core': { requiredVersion: 'auto' },
     primeng: { requiredVersion: 'auto', includeSecondaries: true },
     rxjs: { requiredVersion: 'auto', includeSecondaries: true },
@@ -23,14 +66,12 @@ const config = withModuleFederationPlugin({
     '@onecx/angular-integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/angular-remote-components': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/angular-testing': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-standalone-shell': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/angular-utils': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/angular-webcomponents': { requiredVersion: 'auto', includeSecondaries: true },
-    '@onecx/integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
-    '@onecx/keycloak-auth': { requiredVersion: 'auto', includeSecondaries: true },
-    '@onecx/portal-integration-angular': { requiredVersion: 'auto', includeSecondaries: true },
-    '@onecx/portal-layout-styles': { requiredVersion: 'auto', includeSecondaries: true }
+    '@onecx/integration-interface': { requiredVersion: 'auto', includeSecondaries: true }
   }),
-  sharedMappings: ['@onecx/portal-integration-angular']
+  sharedMappings: []
 })
 config.devServer = { allowedHosts: 'all' }
 
@@ -38,7 +79,7 @@ const plugins = config.plugins.filter((plugin) => !(plugin instanceof ModifyEntr
 
 module.exports = {
   ...config,
-  plugins,
+  plugins: [...plugins, modifyPrimeNgPlugin, modifyMaterialPlugin],
   module: { parser: { javascript: { importMeta: false } } },
   output: { uniqueName: 'onecx-tenant-ui', publicPath: 'auto' },
   experiments: { ...config.experiments, topLevelAwait: true },
