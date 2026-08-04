@@ -1,5 +1,5 @@
-@import '/src/app/_tm-mixins.scss';
+@use '/src/app/_tm-mixins.scss' as *;
 
-@include tabview-fix-color-selected-tab;
-@include displaying-text-responsive;
-@include readable-disabled-form-controls;
+@include ocx-text-responsive;
+@include ocx-required-label;
+@include ocx-p-tabs;

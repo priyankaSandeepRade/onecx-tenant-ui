@@ -1,19 +1,20 @@
-import { CommonModule } from '@angular/common'
-import { Component, Inject, LOCALE_ID, OnInit, QueryList, ViewChildren } from '@angular/core'
+import { ChangeDetectionStrategy, Component, Inject, LOCALE_ID, OnInit, QueryList, ViewChildren } from '@angular/core'
+import { AsyncPipe } from '@angular/common'
 import { FormBuilder, FormControlName, FormGroup, ReactiveFormsModule } from '@angular/forms'
 import { LetDirective } from '@ngrx/component'
 import { Store } from '@ngrx/store'
 import { TranslateModule } from '@ngx-translate/core'
 import { BehaviorSubject, debounceTime, distinctUntilChanged, first, map, Observable, withLatestFrom } from 'rxjs'
-import { PrimeIcons } from 'primeng/api'
+import deepEqual from 'fast-deep-equal'
+
 import { ButtonModule } from 'primeng/button'
 import { CardModule } from 'primeng/card'
 import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputTextModule } from 'primeng/inputtext'
+import { PrimeIcons } from 'primeng/api'
 import { TooltipModule } from 'primeng/tooltip'
-import deepEqual from 'fast-deep-equal'
 
 import {
   Action,
@@ -43,12 +44,11 @@ import { getImageUrl } from 'src/app/shared/utils/image.utils'
   selector: 'app-tenant-search',
   standalone: true,
   imports: [
+    AsyncPipe,
     AngularAcceleratorModule,
     ButtonModule,
     CardModule,
-    CommonModule,
     FloatLabelModule,
-    ImageContainerComponent,
     InputGroupAddonModule,
     InputGroupModule,
     InputTextModule,
@@ -56,8 +56,11 @@ import { getImageUrl } from 'src/app/shared/utils/image.utils'
     PortalPageComponent,
     ReactiveFormsModule,
     TooltipModule,
-    TranslateModule
+    TranslateModule,
+    // components
+    ImageContainerComponent
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tenant-search.component.html',
   styleUrls: ['./tenant-search.component.scss']
 })
@@ -96,7 +99,6 @@ export class TenantSearchComponent implements OnInit {
     })
   )
 
-  layout: 'list' | 'grid' = 'grid'
   diagramColumnId = 'tenantId'
   diagramColumn$ = this.viewModel$.pipe(
     map((vm) => vm.columns.find((e) => e.id === this.diagramColumnId) as DataTableColumn)

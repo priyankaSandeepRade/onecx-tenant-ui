@@ -16,6 +16,7 @@ import { PortalMessageService, UserService } from '@onecx/angular-integration-in
 import { PortalDialogService } from '@onecx/angular-accelerator'
 
 import { ImagesAPIService, RefType, TenantAPIService } from 'src/app/shared/generated'
+
 import { TenantSearchEffects, DialogConfig } from './tenant-search.effects'
 import { TenantSearchActions } from './tenant-search.actions'
 import { tenantSearchSelectors } from './tenant-search.selectors'

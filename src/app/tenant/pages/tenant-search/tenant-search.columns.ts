@@ -5,7 +5,7 @@ export const tenantSearchColumns: DataTableColumn[] = [
     columnType: ColumnType.STRING,
     id: 'orgId',
     nameKey: 'TENANT_SEARCH.COLUMNS.ORG_ID',
-    filterable: true,
+    filterable: false,
     sortable: true,
     predefinedGroupKeys: [
       'TENANT_SEARCH.PREDEFINED_GROUP.DEFAULT',
@@ -17,7 +17,7 @@ export const tenantSearchColumns: DataTableColumn[] = [
     columnType: ColumnType.STRING,
     id: 'tenantId',
     nameKey: 'TENANT_SEARCH.COLUMNS.TENANT_ID',
-    filterable: true,
+    filterable: false,
     sortable: true,
     predefinedGroupKeys: [
       'TENANT_SEARCH.PREDEFINED_GROUP.DEFAULT',
@@ -29,7 +29,7 @@ export const tenantSearchColumns: DataTableColumn[] = [
     columnType: ColumnType.STRING,
     id: 'description',
     nameKey: 'TENANT_SEARCH.COLUMNS.DESCRIPTION',
-    filterable: true,
+    filterable: false,
     sortable: false,
     predefinedGroupKeys: [
       'TENANT_SEARCH.PREDEFINED_GROUP.DEFAULT',

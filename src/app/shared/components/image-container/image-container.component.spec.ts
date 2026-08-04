@@ -1,4 +1,3 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
@@ -7,8 +6,8 @@ import { of } from 'rxjs'
 
 import { AppStateService } from '@onecx/angular-integration-interface'
 
-import { ImageContainerComponent } from './image-container.component'
 import { prepareUrlPath } from '../../utils/image.utils'
+import { ImageContainerComponent } from './image-container.component'
 
 class MockAppStateService {
   currentMfe$ = of({
@@ -38,11 +37,10 @@ describe('ImageContainerComponent', () => {
           en: require('./src/assets/i18n/en.json')
         }).withDefaultLanguage('en')
       ],
-      schemas: [NO_ERRORS_SCHEMA],
       providers: [
-        { provide: AppStateService, useValue: mockAppStateService },
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        { provide: AppStateService, useValue: mockAppStateService }
       ]
     }).compileComponents()
   }))

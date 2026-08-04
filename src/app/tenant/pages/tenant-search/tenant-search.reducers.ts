@@ -41,57 +41,36 @@ export const tenantSearchReducer = createReducer(
     }
     return state
   }),
-  on(
-    TenantSearchActions.searchButtonClicked,
-    (state: TenantSearchState, { searchCriteria }): TenantSearchState => ({
-      ...state,
-      criteria: searchCriteria
-    })
-  ),
-  on(
-    TenantSearchActions.resetButtonClicked,
-    (state: TenantSearchState): TenantSearchState => ({
-      ...state,
-      criteria: {}
-    })
-  ),
-  on(
-    TenantSearchActions.tenantSearchResultsReceived,
-    (state: TenantSearchState, { results }): TenantSearchState => ({
-      ...state,
-      results,
-      loadingData: false
-    })
-  ),
-  on(
-    TenantSearchActions.tenantSearchResultsLoadingFailed,
-    (state: TenantSearchState): TenantSearchState => ({
-      ...state,
-      results: [],
-      loadingData: false
-    })
-  ),
-  on(
-    TenantSearchActions.chartVisibilityRehydrated,
-    (state: TenantSearchState, { visible }): TenantSearchState => ({
-      ...state,
-      chartVisible: visible
-    })
-  ),
-  on(
-    TenantSearchActions.chartVisibilityToggled,
-    (state: TenantSearchState): TenantSearchState => ({
-      ...state,
-      chartVisible: !state.chartVisible
-    })
-  ),
-  on(
-    TenantSearchActions.viewModeChanged,
-    (state: TenantSearchState, { viewMode }): TenantSearchState => ({
-      ...state,
-      viewMode: viewMode
-    })
-  ),
+  on(TenantSearchActions.searchButtonClicked, (state: TenantSearchState, { searchCriteria }): TenantSearchState => ({
+    ...state,
+    criteria: searchCriteria
+  })),
+  on(TenantSearchActions.resetButtonClicked, (state: TenantSearchState): TenantSearchState => ({
+    ...state,
+    criteria: {}
+  })),
+  on(TenantSearchActions.tenantSearchResultsReceived, (state: TenantSearchState, { results }): TenantSearchState => ({
+    ...state,
+    results,
+    loadingData: false
+  })),
+  on(TenantSearchActions.tenantSearchResultsLoadingFailed, (state: TenantSearchState): TenantSearchState => ({
+    ...state,
+    results: [],
+    loadingData: false
+  })),
+  on(TenantSearchActions.chartVisibilityRehydrated, (state: TenantSearchState, { visible }): TenantSearchState => ({
+    ...state,
+    chartVisible: visible
+  })),
+  on(TenantSearchActions.chartVisibilityToggled, (state: TenantSearchState): TenantSearchState => ({
+    ...state,
+    chartVisible: !state.chartVisible
+  })),
+  on(TenantSearchActions.viewModeChanged, (state: TenantSearchState, { viewMode }): TenantSearchState => ({
+    ...state,
+    viewMode: viewMode
+  })),
   on(TenantSearchActions.displayedColumnsChanged, (state: TenantSearchState, { displayedColumns }) => ({
     ...state,
     displayedColumns: displayedColumns.map((c) => c.id)

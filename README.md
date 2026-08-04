@@ -1,3 +1,3 @@
 # onecx-tenant-ui
 
-OneCX Tenant User Interface
+OneCX Tenant UI

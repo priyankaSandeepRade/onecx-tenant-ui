@@ -13,11 +13,7 @@ describe('apiConfigProvider', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideAppStateServiceMock()
-      ]
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideAppStateServiceMock()]
     }).compileComponents()
 
     injector = TestBed.inject(Injector)

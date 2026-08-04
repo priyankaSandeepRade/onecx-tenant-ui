@@ -1,6 +1,5 @@
 import { DoBootstrap, Injector, NgModule, inject, isDevMode, provideAppInitializer } from '@angular/core'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { BrowserModule } from '@angular/platform-browser'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouterModule, Router } from '@angular/router'
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core'
@@ -12,13 +11,14 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools'
 import { AngularAuthModule } from '@onecx/angular-auth'
 import {
   createTranslateLoader,
+  MultiLanguageMissingTranslationHandler,
   providePermissionService,
   provideThemeConfig,
   provideTranslationPathFromMeta
 } from '@onecx/angular-utils'
 import { createAppEntrypoint, initializeRouter } from '@onecx/angular-webcomponents'
 import { AppStateService } from '@onecx/angular-integration-interface'
-import { AngularAcceleratorMissingTranslationHandler, AngularAcceleratorModule } from '@onecx/angular-accelerator'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 
 import { Configuration } from './shared/generated'
 import { apiConfigProvider } from './shared/utils/apiConfigProvider.utils'
@@ -35,17 +35,20 @@ effectProvidersForWorkaround.forEach((p) => (p.ɵprov.providedIn = null))
 @NgModule({
   imports: [
     AppEntrypointComponent,
-    AngularAuthModule,
-    BrowserModule,
-    BrowserAnimationsModule,
     AngularAcceleratorModule,
+    AngularAuthModule,
+    BrowserAnimationsModule,
     RouterModule.forRoot(routes),
     TranslateModule.forRoot({
       isolate: true,
-      loader: { provide: TranslateLoader, useFactory: createTranslateLoader, deps: [HttpClient] },
+      loader: {
+        provide: TranslateLoader,
+        useFactory: createTranslateLoader,
+        deps: [HttpClient]
+      },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
-        useClass: AngularAcceleratorMissingTranslationHandler
+        useClass: MultiLanguageMissingTranslationHandler
       }
     }),
     StoreModule.forRoot(reducers, { metaReducers }),
@@ -63,15 +66,13 @@ effectProvidersForWorkaround.forEach((p) => (p.ɵprov.providedIn = null))
     { provide: Configuration, useFactory: apiConfigProvider, deps: [Injector] },
     provideAppInitializer(() => initializeRouter(inject(Router), inject(AppStateService))()),
     providePermissionService(),
+    provideHttpClient(withInterceptorsFromDi()),
     provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
-    provideThemeConfig(),
-    provideHttpClient(withInterceptorsFromDi())
+    provideThemeConfig()
   ]
 })
 export class OneCXTenantModule implements DoBootstrap {
-  constructor(private readonly injector: Injector) {
-    console.info('OneCX Tenant Module constructor')
-  }
+  private readonly injector = inject(Injector)
 
   ngDoBootstrap(): void {
     createAppEntrypoint(AppEntrypointComponent, 'ocx-tenant-component', this.injector)

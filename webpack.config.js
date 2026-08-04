@@ -52,11 +52,6 @@ const config = withModuleFederationPlugin({
     '@angular/forms': { requiredVersion: 'auto', includeSecondaries: true },
     '@angular/platform-browser': { requiredVersion: 'auto', includeSecondaries: true },
     '@angular/router': { requiredVersion: 'auto', includeSecondaries: true },
-    '@ngrx/component': { requiredVersion: 'auto', includeSecondaries: true },
-    '@ngrx/effects': { requiredVersion: 'auto', includeSecondaries: true },
-    '@ngrx/router-store': { requiredVersion: 'auto', includeSecondaries: true },
-    '@ngrx/store': { requiredVersion: 'auto', includeSecondaries: true },
-    '@ngrx/store-devtools': { requiredVersion: 'auto', includeSecondaries: true },
     '@ngx-translate/core': { requiredVersion: 'auto' },
     primeng: { requiredVersion: 'auto', includeSecondaries: true },
     rxjs: { requiredVersion: 'auto', includeSecondaries: true },
@@ -66,12 +61,10 @@ const config = withModuleFederationPlugin({
     '@onecx/angular-integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/angular-remote-components': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/angular-testing': { requiredVersion: 'auto', includeSecondaries: true },
-    '@onecx/angular-standalone-shell': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/angular-utils': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/angular-webcomponents': { requiredVersion: 'auto', includeSecondaries: true },
     '@onecx/integration-interface': { requiredVersion: 'auto', includeSecondaries: true }
-  }),
-  sharedMappings: []
+  })
 })
 config.devServer = { allowedHosts: 'all' }
 

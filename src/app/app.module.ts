@@ -1,8 +1,6 @@
 import { Injector, NgModule, isDevMode } from '@angular/core'
-import { CommonModule } from '@angular/common'
 import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
-import { BrowserModule } from '@angular/platform-browser'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
 import { TranslateLoader, TranslateModule, MissingTranslationHandler } from '@ngx-translate/core'
 
 import { LetDirective } from '@ngrx/component'
@@ -37,15 +35,13 @@ import { metaReducers, reducers } from './app.reducers'
 @NgModule({
   imports: [
     AppComponent,
-    CommonModule,
+    AngularAcceleratorModule,
+    AngularAuthModule,
     AppRoutingModule,
-    BrowserModule,
     BrowserAnimationsModule,
     EffectsModule.forRoot([]),
-    AngularAuthModule,
-    AngularAcceleratorModule,
-    StandaloneShellModule,
     LetDirective,
+    StandaloneShellModule,
     StoreRouterConnectingModule.forRoot(),
     StoreModule.forRoot(reducers, { metaReducers }),
     StoreDevtoolsModule.instrument({
@@ -71,13 +67,13 @@ import { metaReducers, reducers } from './app.reducers'
       useFactory: apiConfigProvider,
       deps: [Injector]
     },
+    providePortalDialogService(),
     providePermissionService(),
     provideTranslationPathFromMeta(import.meta.url, 'assets/i18n/'),
-    provideThemeConfig(),
-    provideStandaloneProviders(),
     provideHttpClient(withInterceptorsFromDi()),
-    providePortalDialogService()
-  ],
-  bootstrap: [AppComponent]
+    provideStandaloneProviders(),
+    provideThemeConfig(),
+    provideAnimations()
+  ]
 })
 export class AppModule {}

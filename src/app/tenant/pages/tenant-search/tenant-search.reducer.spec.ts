@@ -1,7 +1,9 @@
 import { routerNavigatedAction } from '@ngrx/router-store'
+
+import { ColumnType } from '@onecx/angular-accelerator'
+
 import { TenantSearchActions } from './tenant-search.actions'
 import { initialState, tenantSearchReducer } from './tenant-search.reducers'
-import { ColumnType } from '@onecx/angular-accelerator'
 import { tenantSearchCriteriasSchema } from './tenant-search.parameters'
 
 describe('TenantSearchReducer', () => {

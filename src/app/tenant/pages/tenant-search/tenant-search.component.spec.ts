@@ -1,37 +1,36 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core'
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing'
 import { provideHttpClient } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms'
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
+import { FormBuilder } from '@angular/forms'
+import { provideNoopAnimations } from '@angular/platform-browser/animations'
 import { ActivatedRoute } from '@angular/router'
-import { LetDirective } from '@ngrx/component'
+import { TranslateService } from '@ngx-translate/core'
+
 import { ofType } from '@ngrx/effects'
 import { Store, StoreModule } from '@ngrx/store'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { TranslateTestingModule } from 'ngx-translate-testing'
+import { firstValueFrom, map, of } from 'rxjs'
+
 import { DialogService } from 'primeng/dynamicdialog'
 import { PrimeIcons } from 'primeng/api'
 
-import { AngularAcceleratorModule, ColumnType, DataTableColumn } from '@onecx/angular-accelerator'
+import { ColumnType, DataTableColumn } from '@onecx/angular-accelerator'
 import { PermissionService } from '@onecx/angular-utils'
 import { UserService } from '@onecx/angular-integration-interface'
+import { provideAppStateServiceMock } from '@onecx/angular-integration-interface/mocks'
 
+import { Tenant } from 'src/app/shared/generated'
 import { TenantSearchActions } from './tenant-search.actions'
 import { TenantSearchComponent } from './tenant-search.component'
 import { initialState } from './tenant-search.reducers'
 import { selectTenantSearchViewModel } from './tenant-search.selectors'
 import { TenantSearchViewModel } from './tenant-search.viewmodel'
 import { TenantSearchHarness } from './tenant-search.harness'
-import { Tenant } from 'src/app/shared/generated'
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed'
-import { TranslateService } from '@ngx-translate/core'
-import { firstValueFrom, map, of } from 'rxjs'
-import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { tenantSearchCriteriasSchema } from './tenant-search.parameters'
-import { CardModule } from 'primeng/card'
-import { provideAppStateServiceMock } from '@onecx/angular-integration-interface/mocks'
 
-fdescribe('TenantSearchComponent', () => {
+describe('TenantSearchComponent', () => {
   let component: TenantSearchComponent
   let fixture: ComponentFixture<TenantSearchComponent>
   let store: MockStore<Store>
@@ -57,29 +56,23 @@ fdescribe('TenantSearchComponent', () => {
   })
 
   /* eslint-disable @typescript-eslint/no-var-requires */
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
       imports: [
         TenantSearchComponent,
-        AngularAcceleratorModule,
-        LetDirective,
-        ReactiveFormsModule,
         StoreModule.forRoot({}),
         TranslateTestingModule.withTranslations({
           de: require('./src/assets/i18n/de.json'),
           en: require('./src/assets/i18n/en.json')
-        }).withDefaultLanguage('en'),
-        NoopAnimationsModule,
-        CardModule
+        }).withDefaultLanguage('en')
       ],
       providers: [
         DialogService,
+        FormBuilder,
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideMockStore({
-          initialState: { tenant: { search: initialState } }
-        }),
-        FormBuilder,
+        provideNoopAnimations(),
+        provideMockStore({ initialState: { tenant: { search: initialState } } }),
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         provideAppStateServiceMock(),
         {
@@ -89,10 +82,9 @@ fdescribe('TenantSearchComponent', () => {
             getPermissions: () => of([])
           }
         }
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
+      ]
     }).compileComponents()
-  })
+  }))
   /* eslint-disable @typescript-eslint/no-var-requires */
 
   beforeEach(async () => {
@@ -113,39 +105,27 @@ fdescribe('TenantSearchComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should dispatch searchButtonClicked action on search', (done) => {
-    const formValue = formBuilder.group({ changeMe: '123' })
-    component.tenantSearchForm = formValue
-    component.visibleFormControls = [{ name: 'changeMe' }] as any
+  describe('search', () => {
+    it('should dispatch searchButtonClicked action on search', (done) => {
+      const formValue = formBuilder.group({ orgId: '123' })
+      component.tenantSearchForm = formValue
+      component.visibleFormControls = [{ name: 'orgId' }] as any
 
-    store.scannedActions$.pipe(ofType(TenantSearchActions.searchButtonClicked)).subscribe((a) => {
-      expect(a.searchCriteria).toEqual({ changeMe: '123' })
-      done()
+      store.scannedActions$.pipe(ofType(TenantSearchActions.searchButtonClicked)).subscribe((a) => {
+        expect(a.searchCriteria).toEqual({ orgId: '123' })
+        done()
+      })
+
+      component.onSearch(formValue)
     })
 
-    component.onSearch(formValue)
-  })
+    it('should dispatch resetButtonClicked action on reset search', () => {
+      const dispatchSpy = jest.spyOn(store, 'dispatch')
 
-  it('should dispatch resetButtonClicked action on reset search', () => {
-    const dispatchSpy = jest.spyOn(store, 'dispatch')
+      component.onResetSearchCriteria()
 
-    component.onResetSearchCriteria()
-
-    expect(dispatchSpy).toHaveBeenCalledWith(TenantSearchActions.resetButtonClicked())
-  })
-
-  it('should dispatch searchButtonClicked action on search', (done) => {
-    const date = new Date()
-    const formValue = formBuilder.group({ date: date })
-    component.tenantSearchForm = formValue
-    component.visibleFormControls = [{ name: 'changeMe' }] as any
-
-    store.scannedActions$.pipe(ofType(TenantSearchActions.searchButtonClicked)).subscribe((a) => {
-      expect(a.searchCriteria).toEqual({ date: null })
+      expect(dispatchSpy).toHaveBeenCalledWith(TenantSearchActions.resetButtonClicked())
     })
-    done()
-
-    component.onSearch(formValue)
   })
 
   it('should convert valid date to UTC and falsy value to null in searchCriteria', (done) => {

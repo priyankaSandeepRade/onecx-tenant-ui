@@ -1,10 +1,19 @@
-<p-tabMenu *ngIf="dialogMode !== dialogModeEnum.CREATE" [model]="menuItems" [(activeItem)]="activeMenuItem">
-  <ng-template #item let-item>
-    <a #tabLink class="p-menuitem-link" [pTooltip]="item.tooltip | translate" tooltipPosition="top">
-      <span class="p-menuitem-text">{{ (item.label | translate) || item.label }}</span>
-    </a>
-  </ng-template>
-</p-tabMenu>
+@if (dialogMode !== dialogModeEnum.CREATE) {
+  <p-tabMenu [model]="menuItems" [(activeItem)]="activeMenuItem">
+    <ng-template #item let-item>
+      <a
+        #tabLink
+        [id]="'tm_tab_' + (item.label | translate)"
+        class="p-menuitem-link"
+        [pTooltip]="item.tooltip | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
+        <span class="p-menuitem-text">{{ (item.label | translate) || item.label }}</span>
+      </a>
+    </ng-template>
+  </p-tabMenu>
+}
 
 <form [formGroup]="formGroup" class="mt-5 sm:mx-2 flex flex-wrap flex-column row-gap-3 sm:row-gap-4">
   @if (selectedTab === 'main') {
@@ -32,64 +41,77 @@
         formControlName="tenantId"
         [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.TENANT_ID' | translate"
         tooltipPosition="top"
+        tooltipEvent="hover"
       />
       <label class="ocx-required-label" for="tm_detail_form_tenantId">
         {{ 'TENANT_CREATE_UPDATE.FORM.TENANT_ID' | translate }}
       </label>
     </p-floatlabel>
 
-    <div class="flex flex-row align-items-center gap-4" *ngIf="dialogMode !== dialogModeEnum.CREATE">
-      <input #fileInput type="file" accept="image/png, image/jpeg" class="hidden" (change)="handleFileChange($event)" />
+    @if (dialogMode !== dialogModeEnum.CREATE) {
+      <div class="flex flex-row align-items-center gap-4">
+        <input
+          #fileInput
+          id="tm_detail_form_image_input"
+          type="file"
+          accept="image/png, image/jpeg"
+          class="hidden"
+          (change)="handleFileChange($event)"
+        />
+        <label class="hidden" for="tm_detail_form_image_input" aria-hidden="true"> exists only for Sonar report </label>
 
-      <img
-        *ngIf="!uploadedFile && !imageRemoved && hasExistingImage"
-        id="tm_detail_form_image_preview"
-        class="border-round-sm max-h-3rem max-w-5rem"
-        [ocxSrc]="getImageUrl()"
-        (load)="onImageLoad()"
-        (error)="onImageError()"
-        alt="Logo"
-      />
-      <img
-        *ngIf="uploadedFile"
-        id="tm_detail_form_image_uploaded"
-        class="border-round-sm max-h-3rem max-w-5rem"
-        [src]="uploadedFilePreview"
-        alt="Logo"
-      />
-      <img
-        *ngIf="(imageRemoved || !hasExistingImage) && !uploadedFile"
-        id="tm_detail_form_image_default"
-        class="border-round-sm max-h-3rem max-w-5rem"
-        [src]="tenantDefaultImagePath"
-        class="pi pi-image image-placeholder"
-        [alt]="'LOGO.PLACEHOLDER' | translate"
-      />
+        @if (uploadedFile) {
+          <img
+            id="tm_detail_form_image_uploaded"
+            class="border-round-sm max-h-3rem max-w-5rem"
+            [src]="uploadedFilePreview"
+            alt="Logo"
+          />
+        } @else if (imageRemoved || !hasExistingImage) {
+          <img
+            id="tm_detail_form_image_default"
+            class="border-round-sm max-h-3rem max-w-5rem"
+            [src]="tenantDefaultImagePath"
+            class="pi pi-image image-placeholder"
+            [alt]="'LOGO.PLACEHOLDER' | translate"
+          />
+        } @else if (!imageRemoved && hasExistingImage) {
+          <img
+            id="tm_detail_form_image_preview"
+            class="border-round-sm max-h-3rem max-w-5rem"
+            [ocxSrc]="getImageUrl()"
+            (load)="onImageLoad()"
+            (error)="onImageError()"
+            alt="Logo"
+          />
+        }
 
-      @if (dialogMode !== dialogModeEnum.DETAILS) {
-        <button
-          pButton
-          type="button"
-          id="tm_detail_form_image_action_remove"
-          icon="pi pi-trash"
-          (click)="handleFileRemove()"
-          [disabled]="(!hasExistingImage || imageRemoved) && !uploadedFile"
-          [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.REMOVE_IMAGE' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        ></button>
-        <button
-          pButton
-          type="button"
-          id="tm_detail_form_image_action_upload"
-          icon="pi pi-upload"
-          (click)="fileInput.click()"
-          [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.CHOOSE_IMAGE' | translate"
-          tooltipPosition="top"
-          tooltipEvent="hover"
-        ></button>
-      }
-    </div>
+        @if (dialogMode !== dialogModeEnum.DETAILS) {
+          <button
+            pButton
+            type="button"
+            id="tm_detail_form_image_action_remove"
+            icon="pi pi-trash"
+            (click)="handleFileRemove()"
+            [disabled]="(!hasExistingImage || imageRemoved) && !uploadedFile"
+            [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.REMOVE_IMAGE' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
+          ></button>
+          <button
+            pButton
+            type="button"
+            id="tm_detail_form_image_action_upload"
+            icon="pi pi-upload"
+            (click)="fileInput.click()"
+            [ariaLabel]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.CHOOSE_IMAGE' | translate"
+            [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.CHOOSE_IMAGE' | translate"
+            tooltipPosition="top"
+            tooltipEvent="hover"
+          ></button>
+        }
+      </div>
+    }
 
     <p-floatlabel controlErrorAnchor variant="on">
       <textarea
@@ -99,8 +121,10 @@
         id="tm_detail_form_description"
         class="w-full pb-2 pt-3"
         formControlName="description"
+        [ariaLabel]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.DESCRIPTION' | translate"
         [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.DESCRIPTION' | translate"
         tooltipPosition="top"
+        tooltipEvent="hover"
       ></textarea>
       <label for="tm_detail_form_description"> {{ 'TENANT_CREATE_UPDATE.FORM.DESCRIPTION' | translate }}</label>
     </p-floatlabel>
@@ -110,10 +134,12 @@
         pInputText
         type="text"
         id="tm_detail_form_creationUser"
-        class="w-full pb-2 pt-3"
+        class="w-full pb-2 pt-3 text-responsive"
         formControlName="creationUser"
+        [ariaLabel]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.CREATION_USER' | translate"
         [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.CREATION_USER' | translate"
         tooltipPosition="top"
+        tooltipEvent="hover"
       />
       <label for="tm_detail_form_creationUser"> {{ 'TENANT_CREATE_UPDATE.FORM.CREATION_USER' | translate }}</label>
     </p-floatlabel>
@@ -122,10 +148,12 @@
         pInputText
         type="text"
         id="tm_detail_form_creationDate"
-        class="w-full pb-2 pt-3"
+        class="w-full pb-2 pt-3 text-responsive"
         formControlName="creationDate"
+        [ariaLabel]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.CREATION_DATE' | translate"
         [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.CREATION_DATE' | translate"
         tooltipPosition="top"
+        tooltipEvent="hover"
       />
       <label for="tm_detail_form_creationDate"> {{ 'TENANT_CREATE_UPDATE.FORM.CREATION_DATE' | translate }}</label>
     </p-floatlabel>
@@ -134,10 +162,12 @@
         pInputText
         type="text"
         id="tm_detail_form_modificationUser"
-        class="w-full pb-2 pt-3"
+        class="w-full pb-2 pt-3 text-responsive"
         formControlName="modificationUser"
+        [ariaLabel]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.MODIFICATION_USER' | translate"
         [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.MODIFICATION_USER' | translate"
         tooltipPosition="top"
+        tooltipEvent="hover"
       />
       <label for="tm_detail_form_modificationUser">
         {{ 'TENANT_CREATE_UPDATE.FORM.MODIFICATION_USER' | translate }}
@@ -149,10 +179,12 @@
         pInputText
         type="text"
         id="tm_detail_form_modificationDate"
-        class="w-full pb-2 pt-3"
+        class="w-full pb-2 pt-3 text-responsive"
         formControlName="modificationDate"
+        [ariaLabel]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.MODIFICATION_DATE' | translate"
         [pTooltip]="'TENANT_CREATE_UPDATE.FORM.TOOLTIPS.MODIFICATION_DATE' | translate"
         tooltipPosition="top"
+        tooltipEvent="hover"
       />
       <label for="tm_detail_form_modificationDate">
         {{ 'TENANT_CREATE_UPDATE.FORM.MODIFICATION_DATE' | translate }}
