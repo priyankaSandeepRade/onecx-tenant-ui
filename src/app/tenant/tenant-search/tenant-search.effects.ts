@@ -5,10 +5,10 @@ import { routerNavigatedAction } from '@ngrx/router-store'
 import { Action, Store } from '@ngrx/store'
 import { concatLatestFrom } from '@ngrx/operators'
 import { concat, from, mergeMap, Observable, catchError, last, map, of, switchMap, tap } from 'rxjs'
+import * as _equal from 'fast-deep-equal'
+const equal = _equal as unknown as (a: any, b: any) => boolean
 
 import { PrimeIcons } from 'primeng/api'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const equal = require('fast-deep-equal')
 
 import { PortalDialogConfig, PortalDialogService } from '@onecx/angular-accelerator'
 import { PortalMessageService, UserService } from '@onecx/angular-integration-interface'
@@ -28,15 +28,13 @@ import {
   Tenant,
   TenantAPIService
 } from 'src/app/shared/generated'
+
 import { TenantSearchActions } from './tenant-search.actions'
 import { TenantSearchComponent } from './tenant-search.component'
 import { tenantSearchSelectors } from './tenant-search.selectors'
 import { TenantSearchCriteria, tenantSearchCriteriasSchema } from './tenant-search.parameters'
-import {
-  TenantCreateUpdateDialogResult,
-  TenantDialogMode
-} from './dialogs/tenant-create-update/tenant-create-update.types'
-import { TenantCreateUpdateComponent } from './dialogs/tenant-create-update/tenant-create-update.component'
+import { TenantDetailDialogResult, TenantDialogMode } from '../tenant-detail/tenant-detail.types'
+import { TenantDetailComponent } from '../tenant-detail/tenant-detail.component'
 
 export const DialogConfig: PortalDialogConfig = {
   modal: true,
@@ -116,10 +114,10 @@ export class TenantSearchEffects {
         return results.find((item) => item.id == action.id)
       }),
       mergeMap((itemToEdit) => {
-        return this.portalDialogService.openDialog<TenantCreateUpdateDialogResult | undefined>(
-          'TENANT_CREATE_UPDATE.UPDATE.HEADER',
+        return this.portalDialogService.openDialog<TenantDetailDialogResult | undefined>(
+          'TENANT_DETAIL.UPDATE.HEADER',
           {
-            type: TenantCreateUpdateComponent,
+            type: TenantDetailComponent,
             inputs: {
               vm: {
                 itemToEdit
@@ -128,15 +126,15 @@ export class TenantSearchEffects {
             }
           },
           {
-            key: 'TENANT_CREATE_UPDATE.UPDATE.FORM.SAVE',
+            key: 'TENANT_DETAIL.UPDATE.FORM.SAVE',
             icon: PrimeIcons.SAVE,
-            tooltipKey: 'TENANT_CREATE_UPDATE.UPDATE.FORM.TOOLTIPS.SAVE',
+            tooltipKey: 'TENANT_DETAIL.UPDATE.FORM.TOOLTIPS.SAVE',
             tooltipPosition: 'bottom'
           },
           {
-            key: 'TENANT_CREATE_UPDATE.UPDATE.FORM.CANCEL',
+            key: 'TENANT_DETAIL.UPDATE.FORM.CANCEL',
             icon: PrimeIcons.TIMES,
-            tooltipKey: 'TENANT_CREATE_UPDATE.UPDATE.FORM.TOOLTIPS.CANCEL',
+            tooltipKey: 'TENANT_DETAIL.UPDATE.FORM.TOOLTIPS.CANCEL',
             tooltipPosition: 'bottom'
           },
           DialogConfig
@@ -148,7 +146,7 @@ export class TenantSearchEffects {
         }
         if (!dialogResult.result) {
           this.messageService.error({
-            summaryKey: 'TENANT_CREATE_UPDATE.UPDATE.ERROR'
+            summaryKey: 'TENANT_DETAIL.UPDATE.ERROR'
           })
           return of(
             TenantSearchActions.updateTenantFailed({
@@ -169,7 +167,7 @@ export class TenantSearchEffects {
           last(),
           map(() => {
             this.messageService.success({
-              summaryKey: 'TENANT_CREATE_UPDATE.UPDATE.SUCCESS'
+              summaryKey: 'TENANT_DETAIL.UPDATE.SUCCESS'
             })
             return TenantSearchActions.updateTenantSucceeded()
           })
@@ -177,7 +175,7 @@ export class TenantSearchEffects {
       }),
       catchError((error) => {
         this.messageService.error({
-          summaryKey: 'TENANT_CREATE_UPDATE.UPDATE.ERROR'
+          summaryKey: 'TENANT_DETAIL.UPDATE.ERROR'
         })
         return of(
           TenantSearchActions.updateTenantFailed({
@@ -192,10 +190,10 @@ export class TenantSearchEffects {
     return this.actions$.pipe(
       ofType(TenantSearchActions.createTenantButtonClicked),
       switchMap(() => {
-        return this.portalDialogService.openDialog<TenantCreateUpdateDialogResult | undefined>(
-          'TENANT_CREATE_UPDATE.CREATE.HEADER',
+        return this.portalDialogService.openDialog<TenantDetailDialogResult | undefined>(
+          'TENANT_DETAIL.CREATE.HEADER',
           {
-            type: TenantCreateUpdateComponent,
+            type: TenantDetailComponent,
             inputs: {
               vm: {
                 itemToEdit: undefined
@@ -204,15 +202,15 @@ export class TenantSearchEffects {
             }
           },
           {
-            key: 'TENANT_CREATE_UPDATE.CREATE.FORM.SAVE',
+            key: 'TENANT_DETAIL.CREATE.FORM.SAVE',
             icon: PrimeIcons.SAVE,
-            tooltipKey: 'TENANT_CREATE_UPDATE.CREATE.FORM.TOOLTIPS.SAVE',
+            tooltipKey: 'TENANT_DETAIL.CREATE.FORM.TOOLTIPS.SAVE',
             tooltipPosition: 'bottom'
           },
           {
-            key: 'TENANT_CREATE_UPDATE.CREATE.FORM.CANCEL',
+            key: 'TENANT_DETAIL.CREATE.FORM.CANCEL',
             icon: PrimeIcons.TIMES,
-            tooltipKey: 'TENANT_CREATE_UPDATE.CREATE.FORM.TOOLTIPS.CANCEL',
+            tooltipKey: 'TENANT_DETAIL.CREATE.FORM.TOOLTIPS.CANCEL',
             tooltipPosition: 'bottom'
           },
           DialogConfig
@@ -224,7 +222,7 @@ export class TenantSearchEffects {
         }
         if (!dialogResult.result) {
           this.messageService.error({
-            summaryKey: 'TENANT_CREATE_UPDATE.CREATE.ERROR'
+            summaryKey: 'TENANT_DETAIL.CREATE.ERROR'
           })
           return of(
             TenantSearchActions.createTenantFailed({
@@ -240,7 +238,7 @@ export class TenantSearchEffects {
         return this.tenantService.createTenant({ createTenantRequest: itemToCreate }).pipe(
           map(() => {
             this.messageService.success({
-              summaryKey: 'TENANT_CREATE_UPDATE.CREATE.SUCCESS'
+              summaryKey: 'TENANT_DETAIL.CREATE.SUCCESS'
             })
             return TenantSearchActions.createTenantSucceeded()
           })
@@ -248,7 +246,7 @@ export class TenantSearchEffects {
       }),
       catchError((error) => {
         this.messageService.error({
-          summaryKey: 'TENANT_CREATE_UPDATE.CREATE.ERROR'
+          summaryKey: 'TENANT_DETAIL.CREATE.ERROR'
         })
         return of(
           TenantSearchActions.createTenantFailed({
@@ -268,10 +266,10 @@ export class TenantSearchEffects {
           return results.find((item) => item.id == action.id)
         }),
         switchMap((tenantDetails) => {
-          return this.portalDialogService.openDialog<TenantCreateUpdateDialogResult | undefined>(
-            'TENANT_CREATE_UPDATE.DETAILS.HEADER',
+          return this.portalDialogService.openDialog<TenantDetailDialogResult | undefined>(
+            'TENANT_DETAIL.DETAILS.HEADER',
             {
-              type: TenantCreateUpdateComponent,
+              type: TenantDetailComponent,
               inputs: {
                 vm: {
                   itemToEdit: tenantDetails
@@ -280,9 +278,9 @@ export class TenantSearchEffects {
               }
             },
             {
-              key: 'TENANT_CREATE_UPDATE.DETAILS.BUTTON',
+              key: 'TENANT_DETAIL.DETAILS.BUTTON',
               icon: PrimeIcons.TIMES,
-              tooltipKey: 'TENANT_CREATE_UPDATE.DETAILS.TOOLTIPS.BUTTON',
+              tooltipKey: 'TENANT_DETAIL.DETAILS.TOOLTIPS.BUTTON',
               tooltipPosition: 'bottom'
             },
             undefined,

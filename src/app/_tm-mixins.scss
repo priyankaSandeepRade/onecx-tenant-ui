@@ -2,8 +2,7 @@
  *  FORM - Control Improvements
  * **********************************************/
 
-/* displaying text like an input field with floating label */
-// Manipulate PrimeNG p-floatlabel
+/* Manipulate PrimeNG p-floatlabel */
 @mixin ocx-p-floatlabel {
   .p-floatlabel {
     // Move the label only if embedded input control (input, textarea etc.) is filled or focussed
@@ -552,6 +551,9 @@
   }
 }
 
+/* **********************************************
+ *  TABs
+ * **********************************************/
 @mixin ocx-p-tabs {
   :host ::ng-deep {
     .p-tabs {

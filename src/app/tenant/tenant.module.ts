@@ -8,7 +8,7 @@ import { providePortalDialogService } from '@onecx/angular-accelerator'
 import { tenantFeature } from './tenant.reducers'
 import { routes } from './tenant.routes'
 
-import { TenantSearchEffects } from './pages/tenant-search/tenant-search.effects'
+import { TenantSearchEffects } from './tenant-search/tenant-search.effects'
 
 @NgModule({
   imports: [

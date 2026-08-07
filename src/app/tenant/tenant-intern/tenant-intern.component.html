@@ -1,0 +1,66 @@
+<div class="flex flex-column justify-content-start align-items-center row-gap-4">
+  <p-float-label variant="on" class="w-full">
+    <input
+      pInputText
+      type="text"
+      id="tm_detail_item_creationDate"
+      class="w-full pt-3 pb-2 text-responsive"
+      [value]="creationDate()"
+      [disabled]="true"
+      [ariaLabel]="'INTERNAL.CREATION_DATE' | translate"
+      [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_DATE' | translate"
+      tooltipPosition="top"
+      tooltipEvent="hover"
+    />
+    <label for="tm_detail_item_creationDate" aria-hidden="true">{{ 'INTERNAL.CREATION_DATE' | translate }}</label>
+  </p-float-label>
+  <p-float-label variant="on" class="w-full">
+    <input
+      pInputText
+      type="text"
+      id="tm_detail_item_creationUser"
+      class="w-full pt-3 pb-2 text-responsive"
+      [value]="tenant()?.creationUser"
+      [disabled]="true"
+      [ariaLabel]="'INTERNAL.CREATION_USER' | translate"
+      [pTooltip]="'INTERNAL.TOOLTIPS.CREATION_USER' | translate"
+      tooltipPosition="top"
+      tooltipEvent="hover"
+    />
+    <label for="tm_detail_item_creationUser" aria-hidden="true">{{ 'INTERNAL.CREATION_USER' | translate }}</label>
+  </p-float-label>
+  <p-float-label variant="on" class="mt-2 w-full">
+    <input
+      pInputText
+      type="text"
+      id="tm_detail_item_modificationDate"
+      class="w-full pt-3 pb-2 text-responsive"
+      [value]="modificationDate()"
+      [disabled]="true"
+      [ariaLabel]="'INTERNAL.MODIFICATION_DATE' | translate"
+      [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_DATE' | translate"
+      tooltipPosition="top"
+      tooltipEvent="hover"
+    />
+    <label for="tm_detail_item_modificationDate" aria-hidden="true">
+      {{ 'INTERNAL.MODIFICATION_DATE' | translate }}
+    </label>
+  </p-float-label>
+  <p-float-label variant="on" class="w-full">
+    <input
+      pInputText
+      type="text"
+      id="tm_detail_item_modificationUser"
+      class="w-full pt-3 pb-2 text-responsive"
+      [value]="tenant()?.modificationUser"
+      [disabled]="true"
+      [ariaLabel]="'INTERNAL.MODIFICATION_USER' | translate"
+      [pTooltip]="'INTERNAL.TOOLTIPS.MODIFICATION_USER' | translate"
+      tooltipPosition="top"
+      tooltipEvent="hover"
+    />
+    <label for="tm_detail_item_modificationUser" aria-hidden="true">
+      {{ 'INTERNAL.MODIFICATION_USER' | translate }}
+    </label>
+  </p-float-label>
+</div>

@@ -1,0 +1,146 @@
+<form [formGroup]="formGroup">
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab
+        value="0"
+        id="tm_tab_props"
+        [ariaLabel]="'TENANT_DETAIL.MENU.TOOLTIPS.PROPERTIES' | translate"
+        [pTooltip]="'TENANT_DETAIL.MENU.TOOLTIPS.PROPERTIES' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
+        {{ 'TENANT_DETAIL.MENU.PROPERTIES' | translate }}
+      </p-tab>
+      <p-tab
+        value="1"
+        id="tm_tab_intern"
+        [ariaLabel]="'TENANT_DETAIL.MENU.TOOLTIPS.INTERNAL' | translate"
+        [pTooltip]="'TENANT_DETAIL.MENU.TOOLTIPS.INTERNAL' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      >
+        {{ 'TENANT_DETAIL.MENU.INTERNAL' | translate }}
+      </p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <div class="mt-2 w-full flex flex-column align-items-start row-gap-4">
+          <p-floatlabel variant="on" class="w-full">
+            <input
+              pInputText
+              type="text"
+              id="tm_detail_form_orgId"
+              class="w-full pb-2 pt-3 text-responsive"
+              formControlName="orgId"
+              [ariaLabel]="'TENANT_DETAIL.FORM.TOOLTIPS.ORG_ID' | translate"
+              [pTooltip]="'TENANT_DETAIL.FORM.TOOLTIPS.ORG_ID' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            />
+            <label class="ocx-required-label" for="tm_detail_form_orgId">
+              {{ 'TENANT_DETAIL.FORM.ORG_ID' | translate }}
+            </label>
+          </p-floatlabel>
+          <p-floatlabel variant="on" class="w-full">
+            <input
+              pInputText
+              type="text"
+              id="tm_detail_form_tenantId"
+              class="w-full pb-2 pt-3 text-responsive"
+              formControlName="tenantId"
+              [ariaLabel]="'TENANT_DETAIL.FORM.TOOLTIPS.TENANT_ID' | translate"
+              [pTooltip]="'TENANT_DETAIL.FORM.TOOLTIPS.TENANT_ID' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            />
+            <label class="ocx-required-label" for="tm_detail_form_tenantId">
+              {{ 'TENANT_DETAIL.FORM.TENANT_ID' | translate }}
+            </label>
+          </p-floatlabel>
+
+          @if (dialogMode !== TenantDialogMode.CREATE) {
+            <div class="flex flex-row align-items-center gap-4">
+              <input
+                #fileInput
+                id="tm_detail_form_image_input"
+                type="file"
+                accept="image/png, image/jpeg"
+                class="hidden"
+                (change)="handleFileChange($event)"
+              />
+              <label class="hidden" for="tm_detail_form_image_input" aria-hidden="true">
+                exists only for Sonar report
+              </label>
+
+              @if (uploadedFile) {
+                <img
+                  id="tm_detail_form_image_uploaded"
+                  class="border-round-sm max-h-3rem max-w-5rem"
+                  [src]="uploadedFilePreview"
+                  alt="Logo"
+                />
+              } @else if (imageRemoved || !hasExistingImage) {
+                <img
+                  id="tm_detail_form_image_default"
+                  class="border-round-sm max-h-3rem max-w-5rem"
+                  [src]="tenantDefaultImagePath"
+                  class="pi pi-image image-placeholder"
+                  [alt]="'LOGO.PLACEHOLDER' | translate"
+                />
+              } @else if (!imageRemoved && hasExistingImage) {
+                <img
+                  id="tm_detail_form_image_preview"
+                  class="border-round-sm max-h-3rem max-w-5rem"
+                  [ocxSrc]="getImageUrl()"
+                  (load)="onImageLoad()"
+                  (error)="onImageError()"
+                  alt="Logo"
+                />
+              }
+
+              @if (dialogMode !== TenantDialogMode.DETAILS) {
+                <p-button
+                  id="tm_detail_form_image_action_remove"
+                  icon="pi pi-trash"
+                  (onClick)="handleFileRemove()"
+                  [disabled]="(!hasExistingImage || imageRemoved) && !uploadedFile"
+                  [pTooltip]="'TENANT_DETAIL.FORM.TOOLTIPS.REMOVE_IMAGE' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                ></p-button>
+                <p-button
+                  id="tm_detail_form_image_action_upload"
+                  icon="pi pi-upload"
+                  (onClick)="fileInput.click()"
+                  [ariaLabel]="'TENANT_DETAIL.FORM.TOOLTIPS.CHOOSE_IMAGE' | translate"
+                  [pTooltip]="'TENANT_DETAIL.FORM.TOOLTIPS.CHOOSE_IMAGE' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                ></p-button>
+              }
+            </div>
+          }
+          <p-floatlabel variant="on" class="w-full">
+            <textarea
+              pInputTextarea
+              rows="3"
+              type="text"
+              id="tm_detail_form_description"
+              class="w-full pb-2 pt-3"
+              formControlName="description"
+              [ariaLabel]="'TENANT_DETAIL.FORM.TOOLTIPS.DESCRIPTION' | translate"
+              [pTooltip]="'TENANT_DETAIL.FORM.TOOLTIPS.DESCRIPTION' | translate"
+              tooltipPosition="top"
+              tooltipEvent="hover"
+            ></textarea>
+            <label for="tm_detail_form_description"> {{ 'TENANT_DETAIL.FORM.DESCRIPTION' | translate }}</label>
+          </p-floatlabel>
+        </div>
+      </p-tabpanel>
+      <p-tabpanel value="1">
+        <app-tenant-intern [tenant]="vm.itemToEdit" [dateFormat]="dateFormat" />
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</form>

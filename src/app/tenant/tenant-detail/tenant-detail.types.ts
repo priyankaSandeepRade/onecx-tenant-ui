@@ -1,10 +1,10 @@
 import { Tenant } from 'src/app/shared/generated'
 
-export interface TenantCreateUpdateViewModel {
+export interface TenantDetailViewModel {
   itemToEdit: Tenant | undefined
 }
 
-export type TenantCreateUpdateDialogResult = Tenant & {
+export type TenantDetailDialogResult = Tenant & {
   image: File | null
   imageRemoved: boolean
 }

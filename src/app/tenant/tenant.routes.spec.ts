@@ -1,4 +1,4 @@
-import { TenantSearchComponent } from './pages/tenant-search/tenant-search.component'
+import { TenantSearchComponent } from './tenant-search/tenant-search.component'
 import { routes } from './tenant.routes'
 
 describe('bookmark routes', () => {

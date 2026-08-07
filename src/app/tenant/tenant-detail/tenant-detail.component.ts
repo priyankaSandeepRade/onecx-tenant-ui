@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnInit, ViewChild } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  ViewChild
+} from '@angular/core'
 import { Location } from '@angular/common'
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'
 import { TranslateModule } from '@ngx-translate/core'
@@ -6,11 +15,12 @@ import { map } from 'rxjs'
 
 import { ButtonModule } from 'primeng/button'
 import { FloatLabelModule } from 'primeng/floatlabel'
-import { MenuItem } from 'primeng/api'
 import { InputTextModule } from 'primeng/inputtext'
-import { TabMenuModule } from 'primeng/tabmenu'
-import { Textarea } from 'primeng/inputtextarea'
+import { TabsModule } from 'primeng/tabs'
+import { TextareaModule } from 'primeng/textarea'
 import { TooltipModule } from 'primeng/tooltip'
+
+import { TabMenuModule } from 'primeng/tabmenu'
 
 import {
   AngularAcceleratorModule,
@@ -18,19 +28,17 @@ import {
   DialogPrimaryButtonDisabled,
   DialogResult
 } from '@onecx/angular-accelerator'
-import { AppStateService } from '@onecx/angular-integration-interface'
+import { AppStateService, UserService } from '@onecx/angular-integration-interface'
 
 import { ImagesAPIService } from 'src/app/shared/generated'
 import { getImageUrl } from 'src/app/shared/utils/image.utils'
 import { environment } from 'src/environments/environment'
-import {
-  TenantCreateUpdateDialogResult,
-  TenantCreateUpdateViewModel,
-  TenantDialogMode
-} from './tenant-create-update.types'
+
+import { TenantInternComponent } from '../tenant-intern/tenant-intern.component'
+import { TenantDetailDialogResult, TenantDetailViewModel, TenantDialogMode } from './tenant-detail.types'
 
 @Component({
-  selector: 'app-tenant-create-update',
+  selector: 'app-tenant-detail',
   standalone: true,
   imports: [
     AngularAcceleratorModule,
@@ -39,67 +47,56 @@ import {
     InputTextModule,
     ReactiveFormsModule,
     TabMenuModule,
-    Textarea,
+    TabsModule,
+    TextareaModule,
     TooltipModule,
-    TranslateModule
+    TranslateModule,
+    // components
+    TenantInternComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './tenant-create-update.component.html',
-  styleUrls: ['./tenant-create-update.component.scss']
+  templateUrl: './tenant-detail.component.html',
+  styleUrls: ['./tenant-detail.component.scss']
 })
-export class TenantCreateUpdateComponent
+export class TenantDetailComponent
   implements
     DialogPrimaryButtonDisabled,
-    DialogResult<TenantCreateUpdateDialogResult | undefined>,
-    DialogButtonClicked<TenantCreateUpdateComponent>,
+    DialogResult<TenantDetailDialogResult | undefined>,
+    DialogButtonClicked<TenantDetailComponent>,
     OnInit
 {
+  private readonly user = inject(UserService)
+  private readonly formBuilder = inject(FormBuilder)
+  private readonly imageService = inject(ImagesAPIService)
+  private readonly appState = inject(AppStateService)
+
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>
-  @Input() public vm: TenantCreateUpdateViewModel = {
+  @Input() public vm: TenantDetailViewModel = {
     itemToEdit: undefined
   }
 
-  @Input() public dialogMode: TenantDialogMode = TenantDialogMode.CREATE
+  @Input() public dialogMode = TenantDialogMode.CREATE
 
   public formGroup!: FormGroup
 
+  public TenantDialogMode = TenantDialogMode
   primaryButtonEnabled: EventEmitter<boolean> = new EventEmitter()
-  dialogResult: TenantCreateUpdateDialogResult | undefined = undefined
-  dialogModeEnum = TenantDialogMode
-  selectedTab: 'main' | 'internal' = 'main'
+  dialogResult: TenantDetailDialogResult | undefined = undefined
   hasExistingImage = true
   imageRemoved = false
   uploadedFile: File | null = null
   uploadedFilePreview: string | null = null
   tenantDefaultImagePath: string = environment.TENANT_IMAGE_PATH
-  activeMenuItem?: MenuItem
-
-  readonly menuItems: MenuItem[] = [
-    {
-      label: 'TENANT_CREATE_UPDATE.MENU.PROPERTIES',
-      tooltip: 'TENANT_CREATE_UPDATE.MENU.TOOLTIPS.PROPERTIES',
-      command: () => (this.selectedTab = 'main')
-    },
-    {
-      label: 'TENANT_CREATE_UPDATE.MENU.INTERNAL',
-      tooltip: 'TENANT_CREATE_UPDATE.MENU.TOOLTIPS.INTERNAL',
-      command: () => (this.selectedTab = 'internal')
-    }
-  ]
-
+  public dateFormat = 'M/d/yy, hh:mm:ss a'
   private readonly baseImagePath: string
   private uploadedFileUrl: string | null = null
 
-  constructor(
-    private readonly formBuilder: FormBuilder,
-    private readonly imageService: ImagesAPIService,
-    private readonly appState: AppStateService
-  ) {
+  constructor() {
     this.baseImagePath = this.imageService.configuration.basePath!
+    this.dateFormat = this.user.lang$.getValue() === 'de' ? 'dd.MM.yyyy HH:mm:ss' : this.dateFormat
   }
 
   ngOnInit() {
-    this.activeMenuItem = this.menuItems[0]
     this.initForm()
     this.adjustToDialogMode()
     if (this.dialogMode !== TenantDialogMode.DETAILS) {

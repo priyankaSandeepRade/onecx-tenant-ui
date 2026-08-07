@@ -21,8 +21,8 @@ import { TenantSearchEffects, DialogConfig } from './tenant-search.effects'
 import { TenantSearchActions } from './tenant-search.actions'
 import { tenantSearchSelectors } from './tenant-search.selectors'
 import { TenantSearchComponent } from './tenant-search.component'
-import { TenantDialogMode } from './dialogs/tenant-create-update/tenant-create-update.types'
-import { TenantCreateUpdateComponent } from './dialogs/tenant-create-update/tenant-create-update.component'
+import { TenantDialogMode } from '../tenant-detail/tenant-detail.types'
+import { TenantDetailComponent } from '../tenant-detail/tenant-detail.component'
 
 class MockRouter implements Partial<Router> {
   constructor(effectsActions: ReplaySubject<any>) {
@@ -238,34 +238,12 @@ describe('TenantSearchEffects:', () => {
   })
 
   it('should dispatch TenantSearchActions.tenantSearchResultsReceived with search results on new search criteria', (done) => {
-    const tenants = {
-      stream: [
-        {
-          id: '1'
-        },
-        {
-          id: '2'
-        }
-      ],
-      totalElements: 2
-    }
+    const tenants = { stream: [{ id: '1' }, { id: '2' }], totalElements: 2 }
     jest.spyOn(mockedTenantService, 'searchTenants').mockReturnValue(of(tenants) as any)
 
-    const previousSearchCriteriaParams = {
-      orgId: 'prev_org_id',
-      pageNumber: '1',
-      pageSize: '1'
-    }
-    const newSearchCriteriaParams = {
-      orgId: 'org_id',
-      pageNumber: '1',
-      pageSize: '1'
-    }
-    const newSearchCriteria = {
-      orgId: 'org_id',
-      pageNumber: 1,
-      pageSize: 1
-    }
+    const previousSearchCriteriaParams = { orgId: 'prev_org_id', pageNumber: '1', pageSize: '1' }
+    const newSearchCriteriaParams = { orgId: 'org_id', pageNumber: '1', pageSize: '1' }
+    const newSearchCriteria = { orgId: 'org_id', pageNumber: 1, pageSize: 1 }
     store.overrideSelector(tenantSearchSelectors.selectCriteria, newSearchCriteria)
 
     const effects = initEffects()
@@ -577,7 +555,7 @@ describe('TenantSearchEffects:', () => {
 
       effects.editButtonClicked$.subscribe({
         next: (action) => {
-          expect(mockedMessageService.error).toHaveBeenCalledWith({ summaryKey: 'TENANT_CREATE_UPDATE.UPDATE.ERROR' })
+          expect(mockedMessageService.error).toHaveBeenCalledWith({ summaryKey: 'TENANT_DETAIL.UPDATE.ERROR' })
           expect(action.type).toBe(TenantSearchActions.updateTenantFailed.type)
           expect((action as any).error).toBe(updateError)
           done()
@@ -812,7 +790,7 @@ describe('TenantSearchEffects:', () => {
 
       effects.createButtonClicked$.subscribe({
         next: (action) => {
-          expect(mockedMessageService.error).toHaveBeenCalledWith({ summaryKey: 'TENANT_CREATE_UPDATE.CREATE.ERROR' })
+          expect(mockedMessageService.error).toHaveBeenCalledWith({ summaryKey: 'TENANT_DETAIL.CREATE.ERROR' })
           expect(action.type).toBe(TenantSearchActions.createTenantFailed.type)
           expect((action as any).error).toBe(createError)
           done()
@@ -857,9 +835,9 @@ describe('TenantSearchEffects:', () => {
 
       effects.openDetailsButtonClicked$.subscribe(() => {
         expect(openDialogSpy).toHaveBeenCalledWith(
-          'TENANT_CREATE_UPDATE.DETAILS.HEADER',
+          'TENANT_DETAIL.DETAILS.HEADER',
           expect.objectContaining({
-            type: TenantCreateUpdateComponent,
+            type: TenantDetailComponent,
             inputs: expect.objectContaining({
               vm: expect.objectContaining({
                 itemToEdit: tenantDetails
@@ -868,7 +846,7 @@ describe('TenantSearchEffects:', () => {
             })
           }),
           expect.objectContaining({
-            key: 'TENANT_CREATE_UPDATE.DETAILS.BUTTON'
+            key: 'TENANT_DETAIL.DETAILS.BUTTON'
           }),
           undefined,
           expect.objectContaining(DialogConfig)

@@ -1,7 +1,7 @@
 ## Project overview
 
 Angular 19 micro-frontend with **standalone components**, **OnPush change detection** and **signal-first** state management.
-Testing framework: **Karma + Jasmine** — do NOT replace with Jest and do NOT add Jest dependencies.
+Testing framework: **Jest** — do NOT replace with Karma + Jasmine and do NOT add Karma + Jasmine dependencies.
 
 ---
 
@@ -23,6 +23,12 @@ Third-party (primeng/*, ngx-translate/*, file-saver, …)
 OneCX (@onecx/*)
 Local (src/app/*)
 ```
+
+### Module Imports
+- Between the sections, add a blank line.
+- Do not suggest legacy NgModules.
+- Avoid adding redundant template imports in spec files since standalone components self-contain their template dependencies.
+- If there are multiple imports from the same module, combine them into a single import statement and order them alphabetically.
 
 ---
 
@@ -89,8 +95,15 @@ public readonly headers = computed(() => {
 
 ---
 
-## Testing (Karma / Jasmine)
+## PrimeNG & JSDOM Polyfills
 
+The project uses PrimeNG. JSDOM lacks a native ResizeObserver. A global mock for ResizeObserver is defined in setup-jest.ts. When writing components that alter sizes or layouts, ensure tests account for this stub. Turn off @typescript-eslint/no-empty-function strictly via inline eslint-disable only inside setup-jest.ts.
+
+---
+
+## Testing with Jest
+
+- The testing environment is bootstrapped via setup-jest.ts in the project root. Never suggest inline configuration inside jest.config.ts that populates globalThis.ngJest, as it is deprecated; options must be passed as functional arguments in setup-jest.ts.
 - **100% coverage** (statements, branches, functions, lines) for all new or changed code.
 - Use `TestBed.createComponent()` — no shallow rendering, no `NO_ERRORS_SCHEMA`.
 - Do not stub templates via `overrideComponent({ set: { template: '' } })`.
@@ -101,5 +114,3 @@ public readonly headers = computed(() => {
 - Test **one behaviour per `it()` block** — do not combine unrelated assertions.
 - Name tests: `should <behaviour> when <condition>`.
 - Verify that a method or signal exists in the source before writing a test for it.
-- Mock services with `jasmine.createSpyObj()` or `{ provide: X, useValue: mockObj }`.
-

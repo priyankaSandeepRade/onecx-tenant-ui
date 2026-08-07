@@ -1,5 +1,17 @@
 {
-  "TENANT_CREATE_UPDATE": {
+  "INTERNAL": {
+    "CREATION_DATE": "Created on",
+    "CREATION_USER": "Created by",
+    "MODIFICATION_DATE": "Changed on",
+    "MODIFICATION_USER": "Changed by",
+    "TOOLTIPS": {
+      "CREATION_DATE": "Timestamp of the creation",
+      "CREATION_USER": "Name of the user of the creation",
+      "MODIFICATION_DATE": "Timestamp of the last change",
+      "MODIFICATION_USER": "Name of the user of the last change"
+    }
+  },
+  "TENANT_DETAIL": {
     "MENU": {
       "PROPERTIES": "Properties",
       "INTERNAL": "Internal",

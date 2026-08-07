@@ -489,7 +489,7 @@ describe('TenantSearchComponent', () => {
     jest.spyOn(component, 'onCreateTenant')
 
     component.headerActions$.subscribe((actions) => {
-      const createAction = actions.find((a) => a.labelKey === 'TENANT_CREATE_UPDATE.ACTION.CREATE')
+      const createAction = actions.find((a) => a.labelKey === 'TENANT_DETAIL.ACTION.CREATE')
       expect(createAction).toBeDefined()
       createAction?.actionCallback?.()
       expect(component.onCreateTenant).toHaveBeenCalled()

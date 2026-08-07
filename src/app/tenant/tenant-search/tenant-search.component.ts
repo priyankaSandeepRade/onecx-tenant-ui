@@ -87,9 +87,9 @@ export class TenantSearchComponent implements OnInit {
           actionCallback: () => this.toggleChartVisibility()
         },
         {
-          labelKey: 'TENANT_CREATE_UPDATE.ACTION.CREATE',
+          labelKey: 'TENANT_DETAIL.ACTION.CREATE',
           icon: PrimeIcons.PLUS,
-          titleKey: 'TENANT_CREATE_UPDATE.ACTION.CREATE.TOOLTIP',
+          titleKey: 'TENANT_DETAIL.ACTION.CREATE.TOOLTIP',
           show: 'always',
           permission: 'TENANT#ADMIN_CREATE',
           actionCallback: () => this.onCreateTenant()
